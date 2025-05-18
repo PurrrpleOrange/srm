@@ -1,52 +1,42 @@
 package com.srm.srmapp.controller;
 
+import com.srm.srmapp.DTO.SupplyRequestDTO;
 import com.srm.srmapp.model.Supplier;
-import com.srm.srmapp.repository.SupplierRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.srm.srmapp.service.SupplierService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/suppliers")
+@RequiredArgsConstructor
 public class SupplierController {
 
-    private final SupplierRepository supplierRepository;
-
-    @Autowired
-    public SupplierController(SupplierRepository supplierRepository) {
-        this.supplierRepository = supplierRepository;
-    }
+    private final SupplierService supplierService;
 
     @GetMapping
-    public List<Supplier> getAllSuppliers() {
-        return supplierRepository.findAll();
+    public List<Supplier> getAll() {
+        return supplierService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Supplier getById(@PathVariable Long id) {
+        return supplierService.getById(id);
     }
 
     @PostMapping
-    public Supplier createSupplier(@RequestBody Supplier supplier) {
-        return supplierRepository.save(supplier);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteSupplier(@PathVariable Long id) {
-        supplierRepository.deleteById(id);
+    public Supplier create(@RequestBody Supplier supplier) {
+        return supplierService.create(supplier);
     }
 
     @PutMapping("/{id}")
-    public Supplier updateSupplier(@PathVariable Long id, @RequestBody Supplier updatedSupplier) {
-        return supplierRepository.findById(id)
-                .map(existingSupplier -> {
-                    existingSupplier.setName(updatedSupplier.getName());
-                    existingSupplier.setContactEmail(updatedSupplier.getContactEmail());
-                    existingSupplier.setPhoneNumber(updatedSupplier.getPhoneNumber());
-                    existingSupplier.setCategory(updatedSupplier.getCategory());
-                    existingSupplier.setTaxId(updatedSupplier.getTaxId());
-                    existingSupplier.setAddress(updatedSupplier.getAddress());
-                    existingSupplier.setActive(updatedSupplier.getActive());
-                    return supplierRepository.save(existingSupplier);
-                })
-                .orElseThrow(() -> new RuntimeException("Поставщик не найден с ID: " + id));
+    public Supplier update(@PathVariable Long id, @RequestBody Supplier supplier) {
+        return supplierService.update(id, supplier);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        supplierService.delete(id);
+    }
 }

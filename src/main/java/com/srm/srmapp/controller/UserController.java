@@ -15,7 +15,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> allUsers() {
+    public List<User> getAll() {
         return userService.getAll();
     }
 
@@ -24,13 +24,8 @@ public class UserController {
         return userService.getById(id);
     }
 
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        userService.delete(id);
+    @PostMapping
+    public User create(@RequestBody User user) {
+        return userService.create(user);
     }
 }

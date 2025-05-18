@@ -16,20 +16,11 @@ public class Supplier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
-
     private String contactEmail;
-
     private String phoneNumber;
-
-    private String address;
-
-    private String taxId;
-
     private String category;
-
-    private Double rating;
-
+    private String taxId;
+    private String address;
     private Boolean active;
 }

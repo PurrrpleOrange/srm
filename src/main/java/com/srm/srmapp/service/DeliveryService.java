@@ -1,53 +1,77 @@
 package com.srm.srmapp.service;
 
+import com.srm.srmapp.DTO.DeliveryDTO;
 import com.srm.srmapp.model.Delivery;
-import com.srm.srmapp.model.InteractionLog;
+import com.srm.srmapp.model.Status;
 import com.srm.srmapp.model.SupplyRequest;
+import com.srm.srmapp.model.Supplier;
 import com.srm.srmapp.repository.DeliveryRepository;
-import com.srm.srmapp.repository.InteractionLogRepository;
 import com.srm.srmapp.repository.SupplyRequestRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final SupplyRequestRepository supplyRequestRepository;
-    private final InteractionLogRepository logRepository;
 
-    @Autowired
-    public DeliveryService(DeliveryRepository deliveryRepository,
-                           SupplyRequestRepository supplyRequestRepository,
-                           InteractionLogRepository logRepository) {
-        this.deliveryRepository = deliveryRepository;
-        this.supplyRequestRepository = supplyRequestRepository;
-        this.logRepository = logRepository;
+    public List<Delivery> getAll() {
+        return deliveryRepository.findAll();
     }
 
-    public Delivery createDelivery(Delivery delivery) {
-        // Сохраняем поставку
-        Delivery saved = deliveryRepository.save(delivery);
+    public Delivery getById(Long id) {
+        return deliveryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Поставка не найдена"));
+    }
 
-        // Обновляем статус заявки
-        SupplyRequest request = saved.getSupplyRequest();
-        request.setStatus(SupplyRequest.Status.DELIVERED);
-        supplyRequestRepository.save(request);
+    public Delivery create(Long requestId, Status status, LocalDate deliveryDate) {
+        SupplyRequest request = supplyRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+        Supplier supplier = request.getSupplier();
 
-        // Логируем событие
-        InteractionLog log = InteractionLog.builder()
-                .timestamp(LocalDateTime.now())
-                .action("DELIVERY_RECEIVED")
-                .message("Поставка принята по заявке ID = " + request.getId())
+        Delivery delivery = Delivery.builder()
                 .supplyRequest(request)
-                .delivery(saved)
-                .user(null) // если в будущем будет security — можно будет подтягивать пользователя
+                .supplier(supplier)
+                .status(status)
+                .deliveryDate(deliveryDate != null ? deliveryDate : LocalDate.now()) // <-- вот тут
                 .build();
 
-        logRepository.save(log);
-
-        return saved;
+        return deliveryRepository.save(delivery);
     }
+
+
+    public List<DeliveryDTO> getAllDto() {
+        try {
+            return deliveryRepository.findAll().stream()
+                    .map(delivery -> {
+                        // Пошаговая проверка
+                        if (delivery.getSupplyRequest() == null) {
+                            throw new RuntimeException("У поставки нет заявки (supplyRequest = null)");
+                        }
+                        if (delivery.getSupplier() == null) {
+                            throw new RuntimeException("У поставки нет поставщика (supplier = null)");
+                        }
+
+                        return DeliveryDTO.builder()
+                                .id(delivery.getId())
+                                .deliveryDate(delivery.getDeliveryDate())
+                                .status(delivery.getStatus().name())
+                                .requestId(delivery.getSupplyRequest().getId())
+                                .requestCreatedAt(delivery.getSupplyRequest().getCreatedAt())
+                                .supplierId(delivery.getSupplier().getId())
+                                .supplierName(delivery.getSupplier().getName())
+                                .build();
+                    })
+                    .toList();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка в DeliveryService.getAllDto: " + e.getMessage(), e);
+        }
+    }
+
+
 }

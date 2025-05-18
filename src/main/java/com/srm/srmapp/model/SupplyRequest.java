@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "supply_requests")
@@ -25,20 +24,14 @@ public class SupplyRequest {
     private Status status;
 
     @ManyToOne
-    @JoinColumn(name = "supplier_id", nullable = false)
+    @JoinColumn(name = "supplier_id")
     private Supplier supplier;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
-
-    @OneToMany(mappedBy = "supplyRequest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RequestItem> items;
-
-    public enum Status {
-        CREATED,
-        CONFIRMED,
-        DELIVERED,
-        CANCELED
-    }
 }

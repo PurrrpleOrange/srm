@@ -7,14 +7,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DeliveryDTO {
+public class ReturnDTO {
     private Long id;
-    private LocalDate deliveryDate;
+    private LocalDate returnDate;
     private String status;
+    private String reason;
 
-    private Long requestId;
-    private LocalDate requestCreatedAt;
-
+    private Long deliveryId;
     private Long supplierId;
     private String supplierName;
 }

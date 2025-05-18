@@ -16,15 +16,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String articleNumber; // артикул
-
-    @Column(nullable = false)
     private String name;
-
     private String description;
-
     private String category;
-
-    private String unit; // единица измерения (шт, кг и т.д.)
+    private String unit;       // ед. измерения
+    private Double price;
 }

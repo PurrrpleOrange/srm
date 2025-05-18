@@ -3,6 +3,7 @@ package com.srm.srmapp.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.security.Timestamp;
 import java.time.LocalDate;
 
 @Entity
@@ -18,7 +19,7 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate receivedAt;
+    private LocalDate deliveryDate;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -30,10 +31,4 @@ public class Delivery {
     @ManyToOne(optional = false)
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
-
-    public enum Status {
-        RECEIVED,
-        PARTIAL,
-        REJECTED
-    }
 }

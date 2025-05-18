@@ -1,5 +1,6 @@
 package com.srm.srmapp.controller;
 
+import com.srm.srmapp.DTO.SupplyRequestDTO;
 import com.srm.srmapp.model.SupplyRequest;
 import com.srm.srmapp.service.SupplyRequestService;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +26,16 @@ public class SupplyRequestController {
     }
 
     @PostMapping
-    public SupplyRequest create(@RequestParam Long supplierId, @RequestParam Long userId) {
-        return supplyRequestService.create(supplierId, userId);
+    public SupplyRequest create(
+            @RequestParam Long supplierId,
+            @RequestParam Long userId,
+            @RequestParam Long createdById
+    ) {
+        return supplyRequestService.create(supplierId, userId, createdById);
     }
 
-    @PutMapping("/{id}/cancel")
-    public void cancel(@PathVariable Long id) {
-        supplyRequestService.cancel(id);
-    }
-
-    @PutMapping("/{id}/deliver")
-    public void deliver(@PathVariable Long id) {
-        supplyRequestService.markDelivered(id);
+    @GetMapping("/dto")
+    public List<SupplyRequestDTO> getAllDto() {
+        return supplyRequestService.getAllDto();
     }
 }

@@ -15,18 +15,23 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<Product> all() {
+    public List<Product> getAll() {
         return productService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Product byId(@PathVariable Long id) {
+    public Product getById(@PathVariable Long id) {
         return productService.getById(id);
     }
 
     @PostMapping
     public Product create(@RequestBody Product product) {
         return productService.create(product);
+    }
+
+    @PutMapping("/{id}")
+    public Product update(@PathVariable Long id, @RequestBody Product product) {
+        return productService.update(id, product);
     }
 
     @DeleteMapping("/{id}")
